@@ -1,9 +1,11 @@
 local M = {};
 
+-- coroutine.wrap(f, ...) but with no error propagation 
 function M.Wrap(Func, ...)
 	return coroutine.resume(coroutine.create(Func), ...);
 end
 
+-- t[k] but with recursion i.e. allows to search deeper
 function M.find(t, k, recursion)
 	local r = t[k];
 	
@@ -26,8 +28,7 @@ function M.find(t, k, recursion)
 	return nil;
 end
 
-
-
+-- convert value to boolean
 function M.tobool(v)
 	if (v == 1 or v == "true") then
 		return true;
@@ -38,6 +39,7 @@ function M.tobool(v)
 	return v;
 end
 
+-- Instance.new(className) but better
 function M.new(className, properties)
 	local obj = Instance.new(className);
 
@@ -50,6 +52,7 @@ function M.new(className, properties)
 	return obj;
 end
 
+-- Set multiple properties at the same time
 function M.Set(obj, properties)
 	for p, v in pairs(properties or {}) do
 		pcall(function()
@@ -60,6 +63,7 @@ function M.Set(obj, properties)
 	return obj;
 end
 
+-- easily access all services
 function M.GetServices()
 	-- trick
 	
@@ -69,11 +73,11 @@ function M.GetServices()
 			t[className] = v;
 			
 			return v;
-		end,
+		end;
 		__metatable = nil;
 	})
 
-	return services
+	return services;
 end
 
 -- find an instance by hierarchy E.g.: M.hierarchySearch(game, "Workspace.Baseplate")
@@ -93,11 +97,13 @@ function M.hierarchySearch(root, hierarchy, child)
 end
 
 -- upgraded qPerfectionWeld!
-function M.Weld(basePart, breakJoints)
+function M.Weld(basePart, breakJoints, jointType, removeAnchor)
+	jointType = jointType or "WeldConstraint";
+	
 	local function hasWheelJoint(part)
 		for _, surface in ipairs({"TopSurface", "BottomSurface", "LeftSurface", "RightSurface", "FrontSurface", "BackSurface"}) do
 			for _, hingeSurface in ipairs({"Hinge", "Motor", "SteppingMotor"}) do
-				if part[surface].Name == hingeSurface then
+				if (part[surface].Name == hingeSurface) then
 					return true;
 				end
 			end
@@ -107,9 +113,13 @@ function M.Weld(basePart, breakJoints)
 	end
 	
 	local function canBreakJoints(part)
+		if (not breakJoints or hasWheelJoint(part)) then
+			return false;
+		end
+		
 		local connectedParts = part:GetConnectedParts();
 		
-		if (not breakJoints or hasWheelJoint(part) or #connectedParts == 1) then
+		if (#connectedParts == 1) then
 			return false;
 		end
 		
@@ -122,9 +132,7 @@ function M.Weld(basePart, breakJoints)
 		return true;
 	end
 	
-	local function weld(Part0, Part1, jointType, weldParent)
-		jointType = jointType or "WeldConstraint";
-		
+	local function weld(Part0, Part1, weldParent)
 		local WeldConstraint = Part1:FindFirstChild("perfectWeld") or M.new(jointType, {
 			Name = "perfectWeld";
 			Part0  = Part0;
@@ -135,7 +143,7 @@ function M.Weld(basePart, breakJoints)
 		return WeldConstraint;
 	end
 	
-	local function weldParts(parts, primaryPart, jointType, removeAnchor)
+	local function weldParts(parts, primaryPart)
 		for _, part in ipairs(parts) do
 			if (canBreakJoints(part)) then
 				part:BreakJoints();
@@ -144,7 +152,7 @@ function M.Weld(basePart, breakJoints)
 		
 		for _, part in ipairs(parts) do
 			if (part ~= primaryPart) then
-				weld(primaryPart, part, jointType, primaryPart);
+				weld(primaryPart, part, primaryPart);
 			end
 		end
 		
@@ -175,7 +183,7 @@ function M.Weld(basePart, breakJoints)
 			basePart:IsA("Model") and basePart.PrimaryPart or Parts[1];
 		
 		if (PrimaryPart) then
-			weldParts(Parts, PrimaryPart, "WeldConstraint", false);
+			weldParts(Parts, PrimaryPart);
 		else
 			warn('Perfect weld failed - PrimaryPart not found');
 		end
@@ -186,8 +194,22 @@ function M.Weld(basePart, breakJoints)
 	local Tool = perfectWeld();
 	
 	if (Tool and not game:GetService("RunService"):IsClient()) then
-		basePart.AncestryChanged:Connect(perfectWeld());
+		basePart.AncestryChanged:Connect(perfectWeld);
 	end
 end
 
-return M
+function M.import(a, b)
+	local globalEnvironment = getfenv(0);
+	
+	if (not b) then
+		for key, value in pairs(a) do
+			globalEnvironment[key] = value;
+		end
+	else
+		for _, key in pairs(a) do
+			globalEnvironment[key] = b[key];  
+		end
+	end
+end
+
+return M;
