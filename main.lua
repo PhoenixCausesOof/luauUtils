@@ -212,7 +212,7 @@ function M.import(a, b)
 	end
 end
 
--- sort arrays by "Name" property in its children (converts to dictionary)
+-- sort arrays by key
 function M.sortArray(t, key)
 	key = key or "Name";
 	local d = {};
