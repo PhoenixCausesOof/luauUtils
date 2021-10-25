@@ -212,4 +212,16 @@ function M.import(a, b)
 	end
 end
 
+-- sort arrays by "Name" property in its children (converts to dictionary)
+function M.sortArray(t, key)
+	key = key or "Name";
+	local d = {};
+	
+	for _, c in ipairs(t) do
+		d[c[key]] = c;
+	end
+	
+	return d;
+end
+
 return M;
