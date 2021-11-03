@@ -98,7 +98,7 @@ local function unpack(t)
     return d;
 end
 
--- cuts the spaces between the ends of a string by default
+-- cut a pattern in the ends of a string
 local function trim(s, p)
     p = p or "%s";
 
