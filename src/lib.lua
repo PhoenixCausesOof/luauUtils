@@ -98,6 +98,13 @@ local function unpack(t)
     return d;
 end
 
+-- cuts the spaces between the ends of a string by default
+local function trim(s, p)
+    p = p or "%s";
+
+    return s:match("^".. p .. "*(.+)" .. p .. "*$");
+end
+
 return {
     find = find;
     split = split;
@@ -107,4 +114,5 @@ return {
     import = import;
     wrap = wrap;
     unpack = unpack;
+    trim = trim;
 };
