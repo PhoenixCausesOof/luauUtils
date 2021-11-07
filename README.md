@@ -21,7 +21,7 @@ Trimming the ends of a string:
 ```lua
 local luauUtils = require(7267811043);
 
-local str = "\0\0\0hello world\0\0\0";
+local str = "   hello world   ";
 str = luauUtils.trim(str); -- removes spaces in the ends of the string, by default.
 ```
 
