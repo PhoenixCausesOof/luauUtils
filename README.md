@@ -1,4 +1,4 @@
-# luaUtils
+# luauUtils
 
 A collection of tools that may or may never help developing a project. This was intended for use in Roblox, but some utilities may work in native Lua.
 
