@@ -7,29 +7,31 @@ A collection of tools that may or may never help developing a project. This was 
 It's as simple as requiring the module by its Id (Roblox):
 
 ```
-local M = require(7267811043);
+local luauUtils = require(7267811043);
 ```
 
 After that, it's up to you what to do!
 
 ## Usage
 
-The module can and is not limited to the following functions:
+The module can, but is not limited to:
 
-Weld an object and its children, create an Instance while simultaneously setting its properties:
+Trimming the ends of a string:
 
+```lua
+local luauUtils = require(7267811043);
+
+local str = "\0\0\0hello world\0\0\0";
+str = luauUtils.trim(str); -- removes spaces in the ends of the string, by default.
 ```
-local M = require(7267811043);
 
-M.Weld(M.new("Part", {Parent = workspace}))
-```
+Joining two tables together:
 
-Join two tables together:
+```lua
+local luauUtils = require(7267811043);
+local t1, t2 = {1, 2, 3}, {4, 5, 6};
 
-```
-local t1, t2 = {1, 2, 3}, {4, 5, 6}
-
-local t = table.join(t1, t2);
+local t = luauUtils.join(t1, t2);
 
 for i, v in ipairs(t) do
     print(i, v); --> 1 1
